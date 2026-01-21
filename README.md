@@ -1,179 +1,161 @@
-🏠 On-Demand Home Services Booking System
+🏠 On-Demand Home Services Booking System<br>
 
-A full-stack application that demonstrates the core booking lifecycle of an on-demand home services marketplace.
-Customers can create service requests, providers can fulfill them, and admins can monitor and intervene when needed.
+A full-stack application that demonstrates the core booking lifecycle of an on-demand home services marketplace.<br>
+Customers can create service requests, providers can fulfill them, and admins can monitor and intervene when needed<br>.
 
-This project focuses on real-world product behavior, not just CRUD.
+This project focuses on real-world product behavior, not just CRUD.<br>
 
-📁 Project Structure
-backend/
- ├── server.js
- ├── routes.js
- ├── dbconfig.js
- ├── .env
- ├── package.json
+⚙️ Setup Instructions (IMPORTANT)<br>
+1️⃣ Prerequisites<br>
 
-frontend/
- ├── src/
- │   ├── App.jsx
- │   ├── Customer.jsx
- │   ├── Provider.jsx
- │   ├── Admin.jsx
- ├── tailwind.config.js
- ├── package.json
+Node.js (v18+ recommended)<br>
+MySQL<br>
+npm<br>
 
-⚙️ Setup Instructions (IMPORTANT)
-1️⃣ Prerequisites
+2️⃣Cloning<br>
+  git clone https://github.com/youknowhim/Clean_fanatics_home_services.git<br>
+  cd Clean_fanatics_home_services<br>
+3️⃣ Backend Setup<br>
+cd backend<br>
+npm install<br>
 
-Node.js (v18+ recommended)
-MySQL
-npm
+3️⃣ Environment Variables<br>
 
-2️⃣Cloning
-  git clone https://github.com/youknowhim/Clean_fanatics_home_services.git
-  cd Clean_fanatics_home_services
-3️⃣ Backend Setup
-cd backend
-npm install
+Create a .env file inside the backend folder:<br>
 
-3️⃣ Environment Variables
-
-Create a .env file inside the backend folder:
-
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
+DB_HOST=localhost<br>
+DB_USER=root<br>
+DB_PASSWORD=your_password<br><br>
 DB_NAME=booking_system
 
-------The database tables are auto-created on server start.-------
+------The database tables are auto-created on server start.-------<br>
 
-4️⃣ Start Backend Server
-node server.js
-Server runs at:
-http://localhost:3000
+4️⃣ Start Backend Server<br>
+node server.js<br>
+Server runs at:<br>
+http://localhost:3000<br>
 
-5️⃣ Frontend Setup
-cd frontend
-npm install
-npm run dev
-
-
-Frontend runs at:
-
-http://localhost:5173
-
-🧠 How the System Works
-
-The system models a real booking lifecycle with clear ownership and responsibilities.
-
-👥 Role-Based Access & Responsibilities
-👤 Customer
-
-Create a booking
-
-Cancel a booking
-
-Business logic
-
-Customer cancellation deletes the booking
-
-Cancellation event is still stored in history
-
-🧑‍🔧 Provider
-
-View bookings
-
-Accept or reject bookings
-Assigned , if accepted by the Provider
-
-Move booking to:
-
-in_progress
-
-completed
-
-Business logic
-
-Reject → UI change , it will be assigned to a provider later
-
-Provider cannot delete bookings
-
-🛠️ Admin
-
-View all active bookings
-
-Cancel or reset bookings (override)
-
-View full booking history (including deleted bookings)
-
-Business logic
-
-Admin does not “accept” bookings
-
-Admin acts as an operational supervisor
-
-Admin can inspect audit logs
-
-🔄 Booking Status Lifecycle
-pending → in_progress → completed
+5️⃣ Frontend Setup<br>
+cd frontend<br>
+npm install<br>
+npm run dev<br>
 
 
-Other flows:
+Frontend runs at:<br>
 
-Provider reject → rejected , assigned later
+http://localhost:5173<br>
 
-Admin cancel → pending
+🧠 How the System Works<br>
 
-Customer cancel → booking deleted completely
+The system models a real booking lifecycle with clear ownership and responsibilities.<br>
 
-🗄️ Database Design
-bookings (Current State)
+👥 Role-Based Access & Responsibilities<br>
+👤 Customer<br>
 
-Stores only active bookings.
+Create a booking<br>
 
-id
-customer_name
-service
-location
-status
-created_at
+Cancel a booking<br>
 
-booking_status_history (Audit Log)
+Business logic<br>
 
-Stores every lifecycle event, even after deletion.
+Customer cancellation deletes the booking<br>
 
-id
-booking_id
-customer_name
-service
-location
-old_status
-new_status
-actor
-timestamp
+Cancellation event is still stored in history<br>
 
-🔍 Observability & History
-Per-Booking History
+🧑‍🔧 Provider<br>
 
-Admin can view full lifecycle of a single booking
+View bookings<br>
 
-Includes actor and timestamp
+Accept or reject bookings<br>
+Assigned , if accepted by the Provider<br>
 
-Full Booking History
+Move booking to:<br>
 
-Shows latest status of every booking ever created
+in_progress<br>
 
-Includes deleted bookings
+completed<br>
 
-Uses history table only
+Business logic<br>
 
-🧠 Key Design Decisions
-1️⃣ Why History Is Immutable
+Reject → UI change , it will be assigned to a provider later<br>
 
-Prevents data loss
+Provider cannot delete bookings<br>
+
+🛠️ Admin<br>
+
+View all active bookings<br>
+
+Cancel or reset bookings (override)<br>
+
+View full booking history (including deleted bookings)<br>
+
+Business logic<br>
+
+Admin does not “accept” bookings<br>
+
+Admin acts as an operational supervisor<br>
+
+Admin can inspect audit logs<br>
+
+🔄 Booking Status Lifecycle<br>
+pending → in_progress → completed<br>
+
+
+Other flows:<br>
+
+Provider reject → rejected , assigned later<br>
+
+Admin cancel → pending<br>
+
+Customer cancel → booking deleted completely<br>
+
+🗄️ Database Design<br>
+bookings (Current State)<br>
+
+Stores only active bookings.<br>
+
+id<br>
+customer_name<br>
+service<br>
+location<br>
+status<br>
+created_at<br>
+
+booking_status_history (Audit Log)<br>
+
+Stores every lifecycle event, even after deletion.<br>
+
+id<br>
+booking_id<br>
+customer_name<br>
+service<br>
+location<br>
+old_status<br>
+new_status<br>
+actor<br>
+timestamp<br>
+
+🔍 Observability & History<br>
+Per-Booking History<br>
+
+Admin can view full lifecycle of a single booking<br>
+
+Includes actor and timestamp<br>
+
+Full Booking History<br>
+
+Shows latest status of every booking ever created<br>
+Includes deleted bookings<br>
+
+Uses history table only<br>
+
+🧠 Key Design Decisions<br>
+1️⃣ Why History Is Immutable<br>
+
+Prevents data loss<br>
 
 Enables auditing
-
+<br>
 Matches real production systems
 
 2️⃣ Why Booking Details Are Stored in History
