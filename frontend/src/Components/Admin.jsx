@@ -60,6 +60,7 @@ export default function Admin() {
     new_status === "completed" ? "bg-green-100" :
     new_status === "cancelled" ? "bg-red-400" :
     new_status === "assigned" ? "bg-green-300" :
+    new_status === "rejected" ? "bg-gray-300" :
     "bg-white";
 
   return (
@@ -85,8 +86,9 @@ export default function Admin() {
 
       {bookings.map(b => (
         <div key={b.id} className={`card ${bg(b.status)}`}>
-          <p className="font-bold">{b.service}</p>
-          <p>{b.customer_name} — {b.location}</p>
+          <p> Service:<b>{b.service}</b> </p>
+          <p> Customer Name: <b>{b.customer_name}</b></p>
+          <p>Location: <b>{b.location}</b></p>
           <p>Status: <b>{b.status}</b></p>
 
           {/* ACTIONS */}
