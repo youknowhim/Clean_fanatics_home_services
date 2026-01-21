@@ -55,7 +55,7 @@ router.patch("/bookings/:id/reject", (req, res) => {
       const { customer_name, service, location, status } = rows[0];
 
       db.query(
-        `UPDATE bookings SET status = 'pending' WHERE id = ?`,
+        `UPDATE bookings SET status = 'rejected' WHERE id = ?`,
         [bookingId]
       );
 
@@ -63,7 +63,7 @@ router.patch("/bookings/:id/reject", (req, res) => {
         `INSERT INTO booking_status_history
          (booking_id, customer_name, service, location,
           old_status, new_status, actor)
-         VALUES (?, ?, ?, ?, ?, 'pending', 'provider')`,
+         VALUES (?, ?, ?, ?, ?, 'rejected', 'provider')`,
         [bookingId, customer_name, service, location, status]
       );
 
@@ -79,7 +79,7 @@ router.patch("/bookings/:id/cancel", (req, res) => {
   const { actor } = req.body;
   const bookingId = req.params.id;
 
-  // CUSTOMER CANCEL → DELETE BOOKING
+  // CUSTOMER CANCEL - DELETE BOOKING
   if (actor === "customer") {
     db.query(
       `SELECT customer_name, service, location, status
@@ -209,17 +209,17 @@ router.get("/bookings/:id/history", (req, res) => {
  */
 router.get("/bookings/history", (req, res) => {
   db.query(
-    `SELECT
-       booking_id,
-       customer_name,
-       service,
-       location,
-       old_status,
-       new_status,
-       actor,
-       timestamp
-     FROM booking_status_history
-     ORDER BY booking_id, timestamp`,
+    `SELECT h.*
+FROM booking_status_history h
+JOIN (
+  SELECT booking_id, MAX(timestamp) AS latest_time
+  FROM booking_status_history
+  GROUP BY booking_id
+) latest
+ON h.booking_id = latest.booking_id
+AND h.timestamp = latest.latest_time
+ORDER BY h.booking_id;
+`,
     (err, rows) => {
       if (err) return res.status(500).send(err);
       res.json(rows);
