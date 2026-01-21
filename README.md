@@ -1,71 +1,102 @@
 🏠 On-Demand Home Services Booking System
 
-A full-stack application that demonstrates the core booking lifecycle for an on-demand home services marketplace, where customers create service requests and providers fulfill them, with admin oversight.
+A full-stack application that demonstrates the core booking lifecycle of an on-demand home services marketplace.
+Customers can create service requests, providers can fulfill them, and admins can monitor and intervene when needed.
 
-This project focuses on real-world system behavior, including state transitions, failure handling, audit logs, and role-based access.
+This project focuses on real-world product behavior, not just CRUD.
 
-📌 Features Overview
-Core Booking Lifecycle
+📁 Project Structure
+backend/
+ ├── server.js
+ ├── routes.js
+ ├── dbconfig.js
+ ├── .env
+ ├── package.json
 
-Create booking (customer)
+frontend/
+ ├── src/
+ │   ├── App.jsx
+ │   ├── Customer.jsx
+ │   ├── Provider.jsx
+ │   ├── Admin.jsx
+ ├── tailwind.config.js
+ ├── package.json
 
-Provider workflow (accept, reject, in-progress, completed)
+⚙️ Setup Instructions (IMPORTANT)
+1️⃣ Prerequisites
 
-Booking status transitions:
+Node.js (v18+ recommended)
+MySQL
+npm
 
-pending → assigned → in_progress → completed
+2️⃣Cloning
+  git clone https://github.com/youknowhim/Clean_fanatics_home_services.git
+  cd Clean_fanatics_home_services
+3️⃣ Backend Setup
+cd backend
+npm install
+
+3️⃣ Environment Variables
+
+Create a .env file inside the backend folder:
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=booking_system
+
+------The database tables are auto-created on server start.-------
+
+4️⃣ Start Backend Server
+node server.js
+Server runs at:
+http://localhost:3000
+
+5️⃣ Frontend Setup
+cd frontend
+npm install
+npm run dev
 
 
-Graceful failure handling:
+Frontend runs at:
 
-Customer cancellation
+http://localhost:5173
 
-Provider rejection
+🧠 How the System Works
 
-Admin intervention
+The system models a real booking lifecycle with clear ownership and responsibilities.
 
-Observability & Audit
-
-Per-booking status history
-
-Full booking history (including deleted bookings)
-
-Actor tracking (customer / provider / admin)
-
-👥 Roles & Responsibilities
+👥 Role-Based Access & Responsibilities
 👤 Customer
 
 Create a booking
 
-Cancel a booking (hard delete)
+Cancel a booking
 
-View own bookings (UI-level)
+Business logic
 
-Business rule
+Customer cancellation deletes the booking
 
-Customer cancellation deletes the booking from active bookings
-
-Cancellation event is still recorded in history
+Cancellation event is still stored in history
 
 🧑‍🔧 Provider
 
-View assigned bookings
+View bookings
 
 Accept or reject bookings
+Assigned , if accepted by the Provider
 
-Move bookings to:
+Move booking to:
 
 in_progress
 
 completed
 
-Cannot delete bookings
+Business logic
 
-Business rule
+Reject → UI change , it will be assigned to a provider later
 
-Provider rejection moves booking back to pending
-
-All actions are logged with actor = provider
+Provider cannot delete bookings
 
 🛠️ Admin
 
@@ -73,72 +104,33 @@ View all active bookings
 
 Cancel or reset bookings (override)
 
-View:
+View full booking history (including deleted bookings)
 
-Per-booking status history
+Business logic
 
-Full booking history (including deleted bookings)
-
-Business rule
-
-Admin does not “accept” bookings like a provider
+Admin does not “accept” bookings
 
 Admin acts as an operational supervisor
 
-All admin actions are logged with actor = admin
+Admin can inspect audit logs
 
-🧠 Design Decisions (Important)
-1️⃣ Separation of State vs History
-
-bookings table → current, active state
-
-booking_status_history table → immutable audit log
-
-This allows:
-
-Full observability
-
-Deleted bookings to retain history
-
-Simple admin debugging
-
-2️⃣ Why History Stores Booking Details
-
-The history table stores:
-
-customer_name
-
-service
-
-location
-
-This ensures:
-
-History remains meaningful even after booking deletion
-
-No need for soft deletes or joins with missing rows
-
-3️⃣ Why Deleted Bookings Disappear from UI
-
-Customer cancellation removes booking from bookings
-
-UI reflects only active bookings
-
-History is visible only in Admin views
-
-This mimics real production systems.
-
-4️⃣ Latest Status Logic
-
-To fetch the latest status per booking, the system uses:
-
-MAX(id)
+🔄 Booking Status Lifecycle
+pending → in_progress → completed
 
 
-instead of timestamp to avoid collisions when multiple events occur within the same second.
+Other flows:
 
-🗄️ Database Schema
+Provider reject → rejected , assigned later
+
+Admin cancel → pending
+
+Customer cancel → booking deleted completely
+
+🗄️ Database Design
 bookings (Current State)
+
+Stores only active bookings.
+
 id
 customer_name
 service
@@ -147,6 +139,9 @@ status
 created_at
 
 booking_status_history (Audit Log)
+
+Stores every lifecycle event, even after deletion.
+
 id
 booking_id
 customer_name
@@ -157,20 +152,12 @@ new_status
 actor
 timestamp
 
-🔄 Booking Cancellation Logic
-Actor	Behavior
-Customer	Insert cancelled in history → delete booking
-Provider	Move booking back to pending
-Admin	Move booking back to pending
-
-History is always written before delete.
-
-🧪 Observability
+🔍 Observability & History
 Per-Booking History
 
-Available in Admin panel
+Admin can view full lifecycle of a single booking
 
-Shows full lifecycle with actor and timestamps
+Includes actor and timestamp
 
 Full Booking History
 
@@ -180,108 +167,88 @@ Includes deleted bookings
 
 Uses history table only
 
-🛠️ Tech Stack
-Backend
+🧠 Key Design Decisions
+1️⃣ Why History Is Immutable
 
-Node.js
+Prevents data loss
 
-Express
+Enables auditing
 
-MySQL
+Matches real production systems
 
-mysql2
+2️⃣ Why Booking Details Are Stored in History
 
-dotenv
+Deleted bookings still need context
 
-Frontend
+Avoids soft deletes
 
-React
+History remains self-contained
 
-Tailwind CSS
+3️⃣ Why Customer Cancel Deletes Booking
 
-Fetch API
+Booking is no longer active
 
-⚙️ Project Setup
-1️⃣ Clone Repository
-git clone <repo-url>
-cd backend
+UI reflects real availability
 
-2️⃣ Install Backend Dependencies
-npm install
+History preserves the event
 
-3️⃣ Environment Variables (.env)
+4️⃣ Latest Status Logic
 
-Create a .env file in the backend root:
+Latest state per booking is fetched using:
 
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=booking_system
+MAX(id)
 
 
-⚠️ .env is not committed to Git.
+instead of timestamp to avoid collisions when multiple events occur within the same second.
 
-4️⃣ Start Backend Server
-node server.js
+🔐 Authentication Note
 
+This project uses UI-level role separation:
 
-Server runs on:
+Customer / Provider / Admin have separate screens
 
-http://localhost:3000
+Backend trusts the actor field
 
-5️⃣ Frontend Setup
-cd frontend
-npm install
-npm run dev
-
-🔐 Role-Based Access (UI-Level)
-
-This project uses UI-level role separation for simplicity:
-
-Customer, Provider, Admin views are separate screens
-
-Backend trusts the actor field for lifecycle logging
-
-Authentication is out of scope for this assignment
+Authentication is out of scope for this assignment.
 
 🚫 Out of Scope (Intentionally)
 
-Authentication / authorization
+Authentication & authorization
 
 Payments
 
 Provider assignment algorithm
 
-Real-time updates
-
 Notifications
 
-✅ Assignment Requirements Mapping
-Requirement	Status
+Real-time updates
+
+✅ Assignment Requirement Mapping
+Requirement	Implemented
 Create booking	✅
-Assign provider	✅ (accept/reject)
+Assign provider	✅
 Partner workflow	✅
-Status lifecycle	✅
+Booking lifecycle	✅
 Cancellations	✅
 Failure handling	✅
-Manual override	✅
+Retry / recovery	✅
+Admin override	✅
 Observability	✅
 Admin panel	✅
-🧾 Final Notes
+🧾 Summary
 
-This project prioritizes:
+This project demonstrates:
 
 Correct lifecycle modeling
 
-Clear separation of responsibilities
+Clear role separation
 
-Realistic backend behavior
+Real-world cancellation logic
 
-Simplicity over over-engineering
+Strong observability via audit logs
 
-It is designed to demonstrate how real systems behave, not just CRUD operations.
+The focus is on system correctness and clarity, not over-engineering.
 
 👨‍💻 Author
-Pallav Rai
 
-Full Stack Engineering Intern Assignment
+Full Stack Engineering Intern – Assignment Submission
