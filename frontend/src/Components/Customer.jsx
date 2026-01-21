@@ -41,6 +41,8 @@ export default function Customer() {
     status === "pending" ? "bg-red-100" :
     status === "in_progress" ? "bg-yellow-100" :
     status === "completed" ? "bg-green-100" :
+    status === "cancelled" ? "bg-red-400" :
+    status === "assigned" ? "bg-green-300" :
     "bg-white";
 
   return (
@@ -80,13 +82,15 @@ export default function Customer() {
           <p className="font-bold">{b.service}</p>
           <p>{b.customer_name} — {b.location}</p>
           <p>Status: <b>{b.status}</b></p>
-
+         {(b.status !== "cancelled" && b.status !== "completed" ) && (
           <button
             className="btn-danger mt-2"
             onClick={() => cancelBooking(b.id)}
           >
             Cancel
           </button>
+          )}
+          
         </div>
       ))}
     </>

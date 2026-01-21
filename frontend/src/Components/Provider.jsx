@@ -42,6 +42,8 @@ export default function Provider() {
       status === "pending" ? "bg-red-100" :
       status === "in_progress" ? "bg-yellow-100" :
       status === "completed" ? "bg-green-100" :
+      status === "cancelled" ? "bg-red-400" :
+      status === "assigned" ? "bg-green-300" :
       "bg-white";
 
   return (
@@ -53,6 +55,9 @@ export default function Provider() {
           <p className="font-bold">{b.service}</p>
           <p>{b.customer_name} — {b.location}</p>
           <p>Status: <b>{b.status}</b></p>
+          {b.status === "rejected" && (
+            <p className="text-red-500">Booking rejected by provider Will assign a Provider later</p>
+          )}
 
           {b.status === "pending" && (
             <div className="flex gap-2 mt-2">

@@ -58,6 +58,8 @@ export default function Admin() {
     new_status === "pending" ? "bg-red-100" :
     new_status === "in_progress" ? "bg-yellow-100" :
     new_status === "completed" ? "bg-green-100" :
+    new_status === "cancelled" ? "bg-red-400" :
+    new_status === "assigned" ? "bg-green-300" :
     "bg-white";
 
   return (
@@ -69,10 +71,11 @@ export default function Admin() {
           <h3 className="font-semibold mb-3">All Booking History (Including Deleted)</h3>
           {fullHistory.map(b => (
             <div key={b.id} className={`card ${bg(b.new_status)}`}>
-              <p className="font-bold">{b.service}</p>
-              <p className = "font-bold">{b.customer_name}</p>
-              <p className = "font-bold">{b.location}</p>
-              <p>LastStatus: <b>{b.new_status}</b></p>
+              <p>Service: <b>{b.service}</b></p>
+              <p>Customer_name: <b>{b.customer_name}</b></p>
+              <p>Location: <b>{b.location}</b></p>
+              <p>Status: <b>{b.new_status}</b></p>
+              <p>Actor: <b>{b.actor}</b></p>
             </div>
             
 
